@@ -18,6 +18,25 @@ _GITHUB_API_LATEST = "https://api.github.com/repos/GianniPanni96/WillowGestional
 _DEFAULT_INSTALL_PATH = r"C:\Program Files\WillowGestionale"
 _BASE_STEPS = 15  # 1 cartelle + 11 tabelle + 1 Data + 1 download + 1 env var
 
+
+def _bootstrap_import_paths() -> None:
+    candidates = []
+
+    if getattr(sys, "frozen", False):
+        exe_dir = Path(sys.executable).resolve().parent
+        candidates.extend([exe_dir, exe_dir / "Installer"])
+    else:
+        project_root = Path(__file__).resolve().parent.parent
+        candidates.extend([project_root, project_root / "Installer"])
+
+    for candidate in candidates:
+        candidate_str = str(candidate)
+        if candidate.exists() and candidate_str not in sys.path:
+            sys.path.insert(0, candidate_str)
+
+
+_bootstrap_import_paths()
+
 # ---------------------------------------------------------------------------
 # Logging setup – scrive su file E su stdout
 # Il file di log è in %TEMP%\willow_installer_debug.log
@@ -39,6 +58,7 @@ log.info(f"Log file: {_LOG_PATH}")
 log.info(f"Python: {sys.version}")
 log.info(f"Frozen: {getattr(sys, 'frozen', False)}")
 log.info(f"Executable: {sys.executable}")
+log.debug(f"sys.path[0:5]: {sys.path[:5]}")
 
 
 # ---------------------------------------------------------------------------
